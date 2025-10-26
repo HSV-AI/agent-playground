@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-playground"
+version = "0.1.0"
+description = "A playground environment for developing and testing agents"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "J. Langley"}
+]
+dependencies = [
+    "pydantic-ai>=0.0.5",
+    "requests>=2.28.0",
+    "click>=8.1.0",
+    "markdown>=3.4.0",
+    "python-dotenv>=0.20.0",
+    "poml>=0.0.8",
+    "tomli>=2.0.0",
+    "bs4>=0.0.2",
+    "playwright>=1.55.0",
+    "logfire>=4.13.0",
+    "mcp-server-git>=2025.9.25",
+]
+
+[project.scripts]
+agent-playground = "agent_playground.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "isort>=5.10.0",
+    "mypy>=0.990",
+]
+
+[tool.setuptools.packages.find]
+include = ["agent_playground*"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.12"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+disallow_untyped_defs = true
