@@ -1,17 +1,16 @@
 import os
 import asyncio
 from pydantic_ai import Agent
-from pydantic_ai.mcp import load_mcp_servers
+from pydantic_ai.mcp import MCPServerStreamableHTTP
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
-
-from .types import MergeRequestSuggestion
 import logfire
 
+from .types import GitHubIssueReport, GitHubIssue
 from pathlib import Path
 
-class GitToolsAgent(Agent):
-    """Agent specialized for interacting with Git repositories and suggesting merge requests."""
+class GitHubIssuesAgent(Agent):
+    """Agent specialized for interacting with GitHub repositories to manage issues."""
     def __init__(self, **kwargs):
         CONFIG_FILE_PATH = Path(__file__).parent / "mcp_config.json"
         SYSTEM_PROMPT_FILE_PATH = Path(__file__).parent / "system_prompt.md"
@@ -24,13 +23,17 @@ class GitToolsAgent(Agent):
                 api_key=os.environ.get("OPENROUTER_API_KEY")
             ),
         )
+        
+        # Using this approach instead of load_mcp_servers to directly define the MCP server
+        # because I could not find a way to pass the environment variable through the config file.
+        mcp_server = MCPServerStreamableHTTP("https://api.githubcopilot.com/mcp",
+            headers={"Authorization": f"Bearer {os.environ.get("GITHUB_TOKEN")}"})
 
-        mcp_toolsets = load_mcp_servers(str(CONFIG_FILE_PATH))
         system_prompt_text = SYSTEM_PROMPT_FILE_PATH.read_text(encoding='utf-8')
         super().__init__(
             model=openrouter_model,
-            # output_type=MergeRequestSuggestion,
-            toolsets=mcp_toolsets,
+            toolsets=[mcp_server],
+            output_type=GitHubIssueReport,
             system_prompt=system_prompt_text,
         )
 
@@ -46,21 +49,28 @@ async def main():
 
     print(f"Running Agent Task: {user_prompt_text}\n")
 
-    agent = GitToolsAgent()
+    agent = GitHubIssuesAgent()
 
     # Run the agent, specifying the desired output structure
     result = await agent.run(
         user_prompt_text,
+        output_type=GitHubIssueReport,
     )
 
-    print("Task Complete! Suggested Merge Request:")
-    print(result.output)
-    # print(f"Title: {result.output.title}")
-    # print(f"Description: {result.output.description}")
-    # print(f"Reviewers: {result.output.suggested_reviewers}")
-    # print(f"Diff Summary: {result.output.diff_summary.summary_message}")
-    # if result.output.error_message:
-    #     print(f"Error: {result.output.error_message}")
+    print("Task Complete! GitHub Issue Report:")
+    # print(result.output)
+    print(f"Repository: {result.output.owner}/{result.output.repository}")
+    print(f"Summary: {result.output.report_summary}")
+    for i, issue in enumerate(result.output.issues):
+        print(f"Issue {i+1}:")
+        print(f"  Title: {issue.title}")
+        print(f"  URL: {issue.url}")
+        print(f"  State: {issue.state}")
+        print(f"  Updated At: {issue.updated_at}")
+        print(f"  Labels: {', '.join(issue.labels)}")
+        print(f"  Author: {issue.author}")
+    if result.output.error_message:
+        print(f"Error: {result.output.error_message}")
 
 
 if __name__ == '__main__':
