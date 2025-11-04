@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=64.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -24,6 +24,11 @@ dependencies = [
     "playwright>=1.55.0",
     "logfire>=4.13.0",
     "mcp-server-git>=2025.9.25",
+    "pytest>=8.4.2",
+    "setuptools>=80.9.0",
+    "dirty-equals>=0.10.0",
+    "anyio>=4.11.0",
+    "pytest-asyncio>=1.2.0",
 ]
 
 [project.scripts]
@@ -37,8 +42,15 @@ dev = [
     "mypy>=0.990",
 ]
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+# src-layout (recommended)
+[tool.setuptools]
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
-include = ["agent_playground*"]
+where = ["src"]
 
 [tool.black]
 line-length = 88
