@@ -17,7 +17,7 @@ from pydantic_ai import (
     DocumentUrl
 )
 
-from agent_playground.custom_tools.runner import Runner
+from agent_playground.custom_tools.agent import ToolsAgent
 from agent_playground.custom_tools.types import User
 
 models.ALLOW_MODEL_REQUESTS = False
@@ -25,7 +25,7 @@ pytestmark = pytest.mark.asyncio
 
 async def test_runner_user_tool():
 
-    runner = Runner()
+    runner = ToolsAgent()
     prompt = "Prompt doesn't matter"
     model = TestModel(call_tools=["get_user"])
     with capture_run_messages() as messages:
@@ -87,7 +87,7 @@ async def test_runner_user_tool():
 
 async def test_runner_current_time_tool():
 
-    runner = Runner()
+    runner = ToolsAgent()
     prompt = "Prompt doesn't matter"
     model = TestModel(call_tools=["get_current_time"])
     with capture_run_messages() as messages:
@@ -153,7 +153,7 @@ async def test_runner_current_time_tool():
 
 async def test_runner_company_logo_tool():
 
-    runner = Runner()
+    runner = ToolsAgent()
     prompt = "Prompt doesn't matter"
     model = TestModel(call_tools=["get_company_logo"])
     with capture_run_messages() as messages:
@@ -218,7 +218,7 @@ async def test_runner_company_logo_tool():
 
 async def test_runner_get_document_tool():
 
-    runner = Runner()
+    runner = ToolsAgent()
     prompt = "Prompt doesn't matter"
     model = TestModel(call_tools=["get_document"])
     with capture_run_messages() as messages:

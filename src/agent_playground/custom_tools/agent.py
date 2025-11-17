@@ -11,7 +11,7 @@ from .types import User
 # Since OpenRouter has a unified API, we can use the OpenAIChatModel with a custom provider.
 OPENROUTER_MODEL = "openai/gpt-4o-mini"  # Using a placeholder compatible Gemma model
 
-class Runner:
+class ToolsAgent:
 
     def __init__(self):
         self._model = OpenAIChatModel(
@@ -55,7 +55,7 @@ async def main():
       logfire.configure(token=LOGFIRE_TOKEN)
       logfire.instrument_pydantic_ai()
 
-    agent = Runner()
+    agent = ToolsAgent()
     result = await agent.run('What time is it?')
     print(result.output)
     #> The current time is 10:45 PM on April 17, 2025.

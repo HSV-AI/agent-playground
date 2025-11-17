@@ -2,7 +2,7 @@ import os
 import asyncio
 from pydantic_ai import Agent
 from pydantic_ai.mcp import MCPServerStdio
-from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 from pydantic_ai.mcp import load_mcp_servers
 import logfire
@@ -22,23 +22,28 @@ class SBIRAgent(Agent):
         # 1. Configure the LLM for OpenRouter
         # We use OpenAIModel because OpenRouter is OpenAI-compatible
         # and we pass the OpenRouterProvider to configure the endpoint.
-        openrouter_model = OpenAIModel(
+        openrouter_model = OpenAIChatModel(
             OPENROUTER_MODEL,
             provider=OpenRouterProvider(
                 api_key=os.environ.get("OPENROUTER_API_KEY") 
             ),
         )
 
-        mcp_toolsets = load_mcp_servers(str(CONFIG_FILE_PATH))
-        system_prompt_text = SYSTEM_PROMPT_FILE_PATH.read_text(encoding='utf-8')
+        self._toolsets = load_mcp_servers(str(CONFIG_FILE_PATH))
+        self._system_prompt_text = SYSTEM_PROMPT_FILE_PATH.read_text(encoding='utf-8')
         super().__init__(
             model=openrouter_model,  # Use a powerful model capable of tool use/reasoning
             output_type=ScrapeResult,
-            toolsets=mcp_toolsets,
-            system_prompt=system_prompt_text,
+            toolsets=self._toolsets,
+            system_prompt=self._system_prompt_text,
         )
 
-
+    def run(self, prompt: str):
+        return self._agent.run(prompt)
+    
+    def run_sync(self, prompt: str):
+        return self._agent.run_sync(prompt)
+    
 async def main():
 
     # configure logfire
