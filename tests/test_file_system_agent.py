@@ -28,7 +28,7 @@ def call_file_tool(
         # first call, call the weather forecast tool
         user_prompt = messages[0].parts[-1]
         args = {'path': 'tests'}  
-        return ModelResponse(parts=[ToolCallPart('filesystem_list_directory', args)])
+        return ModelResponse(parts=[ToolCallPart('list_directory', args)])
     else:
         # second call, return the forecast
         msg = messages[-1].parts[0]
@@ -72,7 +72,7 @@ async def test_runner_get_file_tool():
         ModelResponse(
             parts=[
                 ToolCallPart(
-                    tool_name='filesystem_list_directory', 
+                    tool_name='list_directory', 
                     args={'path': 'tests'}, 
                     tool_call_id=IsStr(),
                 )
@@ -87,7 +87,7 @@ async def test_runner_get_file_tool():
         ModelRequest(
             parts=[
                 ToolReturnPart(
-                    tool_name='filesystem_list_directory', 
+                    tool_name='list_directory', 
                     content=IsStr(),
                     tool_call_id=IsStr(),
                     timestamp=IsNow(tz=timezone.utc)
