@@ -5,6 +5,7 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 from datetime import datetime
 import logfire
+from typing import Any
 from .types import User
 
 # --- Configuration ---
@@ -41,10 +42,10 @@ class ToolsAgent:
         def get_document() -> DocumentUrl:
             return DocumentUrl(url='https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf')
 
-    def run(self, prompt: str):
+    def run(self, prompt: str) -> Any:
         return self._agent.run(prompt)
     
-    def run_sync(self, prompt: str):
+    def run_sync(self, prompt: str) -> Any:
         return self._agent.run_sync(prompt)
 
 async def main():

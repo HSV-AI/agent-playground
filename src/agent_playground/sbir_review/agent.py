@@ -1,17 +1,19 @@
 import os
 import asyncio
-from pydantic_ai import Agent
+from pydantic_ai import Agent, AgentRunResult
 from pydantic_ai.mcp import MCPServerStdio
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 from pydantic_ai.mcp import load_mcp_servers
 import logfire
+from typing import Any
+from types import CoroutineType
 
 from .types import Topic, ScrapeResult
 
 from pathlib import Path
 
-class SBIRAgent(Agent):
+class SBIRAgent():
     """Agent specialized for scraping SBIR topics using BrowserAutomation tools."""
     def __init__(self, **kwargs):
         CONFIG_FILE_PATH = Path(__file__).parent / "mcp_config.json"
@@ -22,7 +24,7 @@ class SBIRAgent(Agent):
         # 1. Configure the LLM for OpenRouter
         # We use OpenAIModel because OpenRouter is OpenAI-compatible
         # and we pass the OpenRouterProvider to configure the endpoint.
-        openrouter_model = OpenAIChatModel(
+        self._model = OpenAIChatModel(
             OPENROUTER_MODEL,
             provider=OpenRouterProvider(
                 api_key=os.environ.get("OPENROUTER_API_KEY") 
@@ -31,17 +33,17 @@ class SBIRAgent(Agent):
 
         self._toolsets = load_mcp_servers(str(CONFIG_FILE_PATH))
         self._system_prompt_text = SYSTEM_PROMPT_FILE_PATH.read_text(encoding='utf-8')
-        super().__init__(
-            model=openrouter_model,  # Use a powerful model capable of tool use/reasoning
+        self._agent = Agent(
+            model=self._model,  # Use a powerful model capable of tool use/reasoning
             output_type=ScrapeResult,
             toolsets=self._toolsets,
             system_prompt=self._system_prompt_text,
         )
 
-    def run(self, prompt: str):
+    def run(self, prompt: str) -> Any:
         return self._agent.run(prompt)
     
-    def run_sync(self, prompt: str):
+    def run_sync(self, prompt: str) -> Any:
         return self._agent.run_sync(prompt)
     
 async def main():

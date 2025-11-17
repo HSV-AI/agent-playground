@@ -1,5 +1,6 @@
 import os
 import asyncio
+from typing import Any
 from pydantic_ai import Agent
 from pydantic_ai.mcp import load_mcp_servers
 from pydantic_ai.models.openai import OpenAIChatModel
@@ -34,10 +35,10 @@ class GitToolsAgent():
             system_prompt=self._system_prompt_text,
         )
 
-    def run(self, prompt: str):
+    def run(self, prompt: str) -> Any:
         return self._agent.run(prompt)
     
-    def run_sync(self, prompt: str):
+    def run_sync(self, prompt: str) -> Any:
         return self._agent.run_sync(prompt)
 
 async def main():

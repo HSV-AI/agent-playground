@@ -5,6 +5,7 @@ from pydantic_ai.mcp import MCPServerStreamableHTTP
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 import logfire
+from typing import Any
 
 from .types import GitHubIssueReport, GitHubIssue
 from pathlib import Path
@@ -33,17 +34,17 @@ class GitHubIssuesAgent():
 
         self._system_prompt_text = SYSTEM_PROMPT_FILE_PATH.read_text(encoding='utf-8')
         
-        super().__init__(
+        self._agent = Agent(
             model=self._model,
             toolsets=self._toolsets,
             output_type=GitHubIssueReport,
             system_prompt=self._system_prompt_text,
         )
 
-    def run(self, prompt: str):
+    def run(self, prompt: str) -> Any:
         return self._agent.run(prompt)
     
-    def run_sync(self, prompt: str):
+    def run_sync(self, prompt: str) -> Any:
         return self._agent.run_sync(prompt)
     
 async def main():
