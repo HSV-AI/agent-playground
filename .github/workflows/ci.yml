@@ -11,6 +11,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Use a recent LTS version
+      - name: Install MCP Server
+        run: npm install -g @modelcontextprotocol/server-filesystem
       - name: Install uv
         run: pip install uv
       - name: Sync repo
