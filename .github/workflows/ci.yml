@@ -6,22 +6,100 @@ env:
   OPENROUTER_API_KEY: 'NOT_A_REAL_KEY'
 
 jobs:
-  build:
+
+  setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20' # Use a recent LTS version
-      - name: Install MCP Server
-        run: npm install -g @modelcontextprotocol/server-filesystem
-      - name: Install uv
-        run: pip install uv
-      - name: Sync repo
-        run: uv sync
-      - name: Run mypy
-        run: uv run mypy src
-      - name: Run tests
-        run: uv run pytest
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    # Caching is essential to speed up subsequent jobs (linting and test)
+    - name: Setup npm cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install global MCP Server (Node)
+      # Note: Global installs are fine for tools, but if this package is used by the code,
+      # it might be better handled as a local dependency or within the specific job that needs it.
+      run: npm install -g @modelcontextprotocol/server-filesystem
+
+    - name: Install uv (Python dependency manager)
+      # Assuming uv is needed for dependency resolution and running scripts
+      run: pip install uv
+
+    - name: Setup uv/pip cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/uv
+        # Adjust the key to match your Python dependency file(s) (e.g., requirements.txt or pyproject.toml)
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml', '**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
+
+    - name: Sync Python dependencies using uv
+      # This step performs the heavy lifting, subsequent jobs will restore from cache
+      run: uv sync
+
+  linting:
+    needs: setup # This job requires the setup job to complete successfully
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      run: pip install uv
+
+    - name: Restore uv/pip cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/uv
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml', '**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
+
+    - name: Sync Python dependencies (Cache hit expected)
+      # This will be fast if the cache hit in the previous step
+      run: uv sync
+
+    - name: Run mypy (Type Check)
+      run: uv run mypy src
+
+  test:
+    needs: setup # This job requires the setup job to complete successfully
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Install uv
+      run: pip install uv
+    
+    - name: Restore uv/pip cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/uv
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml', '**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
+
+    - name: Sync Python dependencies (Cache hit expected)
+      # This will be fast if the cache hit in the previous step
+      run: uv sync
+
+    - name: Run tests (pytest)
+      run: uv run pytest
