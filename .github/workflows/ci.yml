@@ -5,6 +5,10 @@ on: [push, pull_request]
 env:
   OPENROUTER_API_KEY: 'NOT_A_REAL_KEY'
 
+permissions:
+  contents: read
+  pull-requests: write
+  
 jobs:
 
   setup:
@@ -137,8 +141,8 @@ jobs:
         # Only upload for the main branch/pull requests, to keep artifacts clean
         retention-days: 5
 
-    - name: Get Cover 
-      uses: orgoro/coverage@v3.2
+    - name: Coverage comment
+      uses: MishaKav/pytest-coverage-comment@main
       with:
-          coverageFile: coverage.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
+        pytest-xml-coverage-path: ./coverage.xml
+        junitxml-path: ./pytest.xml
