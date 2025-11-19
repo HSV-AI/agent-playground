@@ -1,39 +1,52 @@
 import os
 import asyncio
+from typing import Any
 from pydantic_ai import Agent
-from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.mcp import MCPServerStdio
+from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
-from pydantic_ai.mcp import load_mcp_servers
 import logfire
 
 from pathlib import Path
 
-class FileSystemAgent(Agent):
-    """Agent specialized for file system operations using the FileSystem MCP tool."""
-    def __init__(self, **kwargs):
-        CONFIG_FILE_PATH = Path(__file__).parent / "mcp_config.json"
-        SYSTEM_PROMPT_FILE_PATH = Path(__file__).parent / "system_prompt.md"
+OPENROUTER_MODEL = "openai/gpt-4o-mini"  # Using a placeholder compatible Gemma model
 
-        OPENROUTER_MODEL = "openai/gpt-4o-mini"  # Using a placeholder compatible Gemma model
+class FileSystemAgent():
+    """Agent specialized for file system operations using the FileSystem MCP tool."""
+    
+    def __init__(self):
+
+        # Remove the configuration file dependency
+        # Dynamically get the current working directory
+        self._current_directory = os.getcwd()
+        self._toolsets = [
+            MCPServerStdio("npx", args=["-y", "@modelcontextprotocol/server-filesystem", self._current_directory])
+        ]
+        SYSTEM_PROMPT_FILE_PATH = Path(__file__).parent / "system_prompt.md"
 
         # 1. Configure the LLM for OpenRouter
         # We use OpenAIModel because OpenRouter is OpenAI-compatible
         # and we pass the OpenRouterProvider to configure the endpoint.
-        openrouter_model = OpenAIModel(
+        self._model = OpenAIChatModel(
             OPENROUTER_MODEL,
             provider=OpenRouterProvider(
                 api_key=os.environ.get("OPENROUTER_API_KEY") 
             ),
         )
 
-        mcp_toolsets = load_mcp_servers(str(CONFIG_FILE_PATH))
-        system_prompt_text = SYSTEM_PROMPT_FILE_PATH.read_text(encoding='utf-8')
-        super().__init__(
-            model=openrouter_model,  # Use a powerful model capable of tool use/reasoning
-            toolsets=mcp_toolsets,
-            system_prompt=system_prompt_text,
+        self._system_prompt_text = SYSTEM_PROMPT_FILE_PATH.read_text(encoding='utf-8')
+        
+        self._agent = Agent(
+            model=self._model,  # Use a powerful model capable of tool use/reasoning
+            toolsets=self._toolsets,
+            system_prompt=self._system_prompt_text,
         )
 
+    def run(self, prompt: str) -> Any:
+        return self._agent.run(prompt)
+    
+    def run_sync(self, prompt: str) -> Any:
+        return self._agent.run_sync(prompt)
 
 async def main():
 
@@ -59,4 +72,5 @@ async def main():
     print(result)
 
 if __name__ == '__main__':
+    print("Starting File System Agent Runner with command line MCP...\n")
     asyncio.run(main())

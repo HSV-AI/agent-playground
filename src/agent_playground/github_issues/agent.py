@@ -2,22 +2,23 @@ import os
 import asyncio
 from pydantic_ai import Agent
 from pydantic_ai.mcp import MCPServerStreamableHTTP
-from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 import logfire
+from typing import Any
 
 from .types import GitHubIssueReport, GitHubIssue
 from pathlib import Path
 
-class GitHubIssuesAgent(Agent):
+class GitHubIssuesAgent():
     """Agent specialized for interacting with GitHub repositories to manage issues."""
-    def __init__(self, **kwargs):
+    def __init__(self):
         CONFIG_FILE_PATH = Path(__file__).parent / "mcp_config.json"
         SYSTEM_PROMPT_FILE_PATH = Path(__file__).parent / "system_prompt.md"
 
         OPENROUTER_MODEL = "openai/gpt-4o-mini" # Example model, adjust as needed
 
-        openrouter_model = OpenAIModel(
+        self._model = OpenAIChatModel(
             OPENROUTER_MODEL,
             provider=OpenRouterProvider(
                 api_key=os.environ.get("OPENROUTER_API_KEY")
@@ -26,18 +27,26 @@ class GitHubIssuesAgent(Agent):
         
         # Using this approach instead of load_mcp_servers to directly define the MCP server
         # because I could not find a way to pass the environment variable through the config file.
-        mcp_server = MCPServerStreamableHTTP("https://api.githubcopilot.com/mcp",
-            headers={"Authorization": f"Bearer {os.environ.get("GITHUB_TOKEN")}"})
+        self._toolsets = [
+            MCPServerStreamableHTTP("https://api.githubcopilot.com/mcp",
+                headers={"Authorization": f"Bearer {os.environ.get("GITHUB_TOKEN")}"})
+        ]
 
-        system_prompt_text = SYSTEM_PROMPT_FILE_PATH.read_text(encoding='utf-8')
-        super().__init__(
-            model=openrouter_model,
-            toolsets=[mcp_server],
+        self._system_prompt_text = SYSTEM_PROMPT_FILE_PATH.read_text(encoding='utf-8')
+        
+        self._agent = Agent(
+            model=self._model,
+            toolsets=self._toolsets,
             output_type=GitHubIssueReport,
-            system_prompt=system_prompt_text,
+            system_prompt=self._system_prompt_text,
         )
 
-
+    def run(self, prompt: str) -> Any:
+        return self._agent.run(prompt)
+    
+    def run_sync(self, prompt: str) -> Any:
+        return self._agent.run_sync(prompt)
+    
 async def main():
 
     LOGFIRE_TOKEN = os.environ.get('LOGFIRE_TOKEN')
