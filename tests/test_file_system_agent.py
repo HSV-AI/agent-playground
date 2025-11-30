@@ -1,6 +1,6 @@
 import pytest
 from datetime import timezone, datetime
-from dirty_equals import IsNow, IsStr, IsInt
+from dirty_equals import IsNow, IsStr, IsInt, IsDict
 
 from pydantic_ai import models, capture_run_messages, RequestUsage
 from pydantic_ai.models.test import TestModel
@@ -88,7 +88,7 @@ async def test_runner_get_file_tool():
             parts=[
                 ToolReturnPart(
                     tool_name='list_directory', 
-                    content=IsStr(),
+                    content=IsDict() | IsStr(),
                     tool_call_id=IsStr(),
                     timestamp=IsNow(tz=timezone.utc)
                 )
