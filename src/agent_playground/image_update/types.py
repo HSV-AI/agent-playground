@@ -1,5 +1,6 @@
 from pydantic import BaseModel
+from pydantic_ai.messages import BinaryContent
 
-class User(BaseModel):
-    name: str
-    age: int
+class ImageReturn(BaseModel):
+    prompt: str
+    image: BinaryContent
