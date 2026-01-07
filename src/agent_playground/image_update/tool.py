@@ -55,7 +55,7 @@ async def update_image(prompt: str, image_url: str) -> ToolReturn:
                     ]
                 }
             ],
-            modalities=["text", "image"],
+           # modalities=["text", "image"],
         )
 
         # Extracting the Image
@@ -86,6 +86,10 @@ async def update_image(prompt: str, image_url: str) -> ToolReturn:
 
         print("\n--- No Content or Image Found ---")
         print("Full raw dump for debugging:", message_data)
+        return ToolReturn(
+            return_value="No image was returned from the model.",
+            content=[]
+        )
 
     except Exception as e:
         print(f"An error occurred: {e}")
