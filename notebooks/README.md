@@ -1,17 +1,17 @@
+![HSV-AI Logo](https://hsv.ai/wp-content/uploads/2022/03/logo_v11_2022.png)
+
 # Workshop: Building Your First AI Agents
-**Presenter:** J. (HSV-AI)
-**Duration:** 1 Hour
 **Repository:** [https://github.com/HSV-AI/agent-playground](https://github.com/HSV-AI/agent-playground)
 
----
 
-## 🌟 Abstract
+## 🌟 Vibe Provided Abstract
 In this workshop, we will guide participants through the fundamentals of creating their own AI agents, drawing on deep backgrounds in natural language processing and real-world AI systems. Whether you’re just starting with AI or ready to level up your skills, this hands-on approach will take your learning to the next frontier.
 
 ---
 
 ## ⏱️ Agenda
-1. **Introduction & Theory** (15 mins)
+1. **Introduction & Environment Checkout** (5 mins)
+2. **Basic Definitions** (15 mins)
 2. **Hands-on: The "Hello World" Agent** (10 mins)
 3. **Hands-on: Adding Tools** (15 mins)
 4. **Hands-on: Structured Workers** (10 mins)
@@ -19,23 +19,38 @@ In this workshop, we will guide participants through the fundamentals of creatin
 
 ---
 
-## 1. Introduction: What is Agentic AI?
+## 1. Introduction & Envorinment Checkout
 
-> **🗣️ Speaker Notes:**
-> - Start by contrasting a standard LLM (Chatbot) with an Agent.
-> - **LLM:** "I think the weather is nice." (Hallucination/Training Data)
-> - **Agent:** *Checks API* -> "The weather is 72°F and sunny."
-> - Explain the Loop: **Perceive** -> **Think (Reason)** -> **Act (Tool)** -> **Observe Result**.
 
-0:00 - 0:05 | Introduction & Setup
+### Introduction / What I do:
+- Chief Technical Officer - CohesionForce, Inc
+- Founder - Huntsville AI
+- AI Huntsville - Workforce Development Committee
+- Captain/Treasurer - Keel Mountain Volunteer Fire Department
 
-Welcome & Speaker Intro (J.)
 
-What is "Agentic AI"? (Brief Definition)
+> I believe that the best way to ensure that AI is used for the greater good is to involve the greatest number of perspectives in its development, testing, and use.
 
-Environment Check (Google Colab / GitHub Repo)
+### Environment Checkout
 
-0:05 - 0:15 | Concepts: The Agentic Loop
+Each notebook includes a link that will load the notebook into Google Colab. You can also load and run locally if you have your own environment.
+
+For local development, follow the instructions in the [Repo README.md](https://github.com/HSV-AI/agent-playground/blob/dev/README.md)
+
+## 2. Basic Definitions
+
+### THOUGHT QUESTION - What is an Agent?
+
+Literally thinking, how many types of agents can we name in 30 seconds?
+
+### Now, what is an AI Agent?
+
+HuggingFace Definition:
+
+>An Agent is a system that leverages an AI model to interact with its environment in order to achieve a user-defined objective. It combines reasoning, planning, and the execution of actions (often via external tools) to fulfill tasks.
+
+### THOUGHT QUESTION - How is this different from just automating a task?
+
 
 The Core Loop: Explain the continuous cycle of Perceive -> Think -> Act -> Observe.
 
@@ -53,20 +68,3 @@ Type Safety: Ensures that the data going into and coming out of tools and models
 
 Structured Output: Allows us to get predictable, parseable data objects back from the agent, not just free-form text.
 
-### The Tech Stack
-Today we are using **PydanticAI**.
-- **Why?** It brings production-grade type safety to agents. If your agent tries to call a tool with the wrong arguments, Pydantic catches it *before* it breaks your code.
-
----
-
-## 2. Hands-on: Setup
-
-Open Google Colab and install the necessary libraries.
-
-```python
-# 💻 CODE BLOCK for Colab
-!pip install pydantic-ai nest_asyncio
-!pip install devtools
-
-import nest_asyncio
-nest_asyncio.apply() # Required for running async agents in Jupyter
