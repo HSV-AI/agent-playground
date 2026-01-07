@@ -1,7 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from agent_playground.image_update.tool import ImageUpdateTool
-from agent_playground.image_update.types import ImageReturn
 from pydantic_ai.messages import BinaryContent
 import base64
 import os
