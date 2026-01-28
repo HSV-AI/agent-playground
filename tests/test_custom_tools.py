@@ -18,7 +18,7 @@ from pydantic_ai import (
 )
 
 from agent_playground.custom_tools.agent import ToolsAgent
-from agent_playground.custom_tools.types import User
+from agent_playground.custom_tools.models import User
 
 models.ALLOW_MODEL_REQUESTS = False
 pytestmark = pytest.mark.asyncio
