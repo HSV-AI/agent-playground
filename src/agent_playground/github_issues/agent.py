@@ -7,7 +7,7 @@ from pydantic_ai.providers.openrouter import OpenRouterProvider
 import logfire
 from typing import Any
 
-from .types import GitHubIssueReport, GitHubIssue
+from agent_playground.github_issues.models import GitHubIssueReport, GitHubIssue
 from pathlib import Path
 
 class GitHubIssuesAgent():
@@ -63,7 +63,6 @@ async def main():
     # Run the agent, specifying the desired output structure
     result = await agent.run(
         user_prompt_text,
-        output_type=GitHubIssueReport,
     )
 
     print("Task Complete! GitHub Issue Report:")

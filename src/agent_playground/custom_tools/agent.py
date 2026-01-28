@@ -6,7 +6,7 @@ from pydantic_ai.providers.openrouter import OpenRouterProvider
 from datetime import datetime
 import logfire
 from typing import Any
-from .types import User
+from agent_playground.custom_tools.models import User
 
 # --- Configuration ---
 # Since OpenRouter has a unified API, we can use the OpenAIChatModel with a custom provider.
@@ -72,6 +72,10 @@ async def main():
     result = await agent.run('What is the main content of the document?')
     print(result.output)
     #> The document contains just the text "Dummy PDF file."
+
+    result = await agent.run('How old is Susan?')
+    print(result.output)
+
 
 if __name__ == '__main__':
     asyncio.run(main())

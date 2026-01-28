@@ -17,8 +17,8 @@ class ImageUpdateAgent():
     def __init__(self):
         SYSTEM_PROMPT_FILE_PATH = Path(__file__).parent / "system_prompt.md"
 
-        # OPENROUTER_MODEL = "openai/gpt-4o-mini" # Example model, adjust as needed
-        OPENROUTER_MODEL = "mistralai/devstral-2512"
+        OPENROUTER_MODEL = "openai/gpt-4o-mini" # Example model, adjust as needed
+        # OPENROUTER_MODEL = "mistralai/devstral-2512"
         self._model = OpenAIChatModel(
             OPENROUTER_MODEL,
             provider=OpenRouterProvider(
