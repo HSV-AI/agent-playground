@@ -9,7 +9,7 @@ import logfire
 from typing import Any
 from types import CoroutineType
 
-from .types import Topic, ScrapeResult
+from agent_playground.sbir_review.models import Topic, ScrapeResult
 
 from pathlib import Path
 
@@ -63,7 +63,6 @@ async def main():
     # Run the agent, specifying the desired output structure
     result = await agent.run(
         user_prompt_text,
-        output_type=ScrapeResult,
     )
 
     print("Task Complete! Extracted Structured Data:")
